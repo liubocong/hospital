@@ -1,12 +1,14 @@
 <template>
-    <memuheader/>
+    <memuheader />
     <div class="form">
         <el-form :inline="true" :model="search">
-            <el-form-item prop="out_trade_no">
+            <el-form-item prop="out_trade_no" :rules="[
+                { required: true, message: '请输入订单号' }
+            ]">
                 <el-input v-model="search.out_trade_no" placeholder="订单号" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitSearch">查询</el-button>
+                <el-button type="primary" @click="submitSearch()">查询</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -59,9 +61,9 @@
 </template>
 
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { adminOrder, updateOrder } from '../../../api'
-import memuheader from '../../../components/memuheader.vue';
+import memuheader from '../../../components/memuheader.vue'
 const search = reactive({
     out_trade_no: ''
 })
@@ -78,12 +80,17 @@ const type = {
     '待支付': 'warning',
     '已完成': 'success'
 }
-const submitSearch = function () {
+const submitSearch = () => {
+    if (search.out_trade_no === '') {
+        return
+    }
     adminOrder({ ...pageInfo, ...search }).then((result) => {
         tableInfo.list = result.data.data.list
         tableInfo.total = result.data.data.total
-    })
+    }
+    )
 }
+
 const handleCurrentChange = function () {
     adminOrder(pageInfo).then((result) => {
         //console.log(result)
